@@ -29,8 +29,6 @@ const PostList = () => {
         setPosts(result);
     }
 
-
-
     return (
         <><div>
             {posts && posts.docs.map((post) => (
