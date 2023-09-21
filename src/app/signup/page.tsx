@@ -1,32 +1,54 @@
 'use client'
 import signUp from "@/firebase/auth/signup";
+import { Alert, Backdrop, CircularProgress, Snackbar } from "@mui/material";
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
+import { validateEmailField, validatePasswordField } from "../utils/validation";
 
 function Page(): JSX.Element {
   const [username, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
   const router = useRouter();
 
   // Handle form submission
   const handleForm = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
+    setLoading(true);
 
-    // Attempt to sign up with provided email and password
-    const { result, error } = await signUp(username, email, password);
+    const isEmailValid = validateEmailField(email);
 
-    if (error) {
-      // Display and log any sign-up errors
-      console.log(error);
+    if (!isEmailValid) {
+      setAlert(true);
+      setLoading(false);
+      setAlertMessage('Incorrect formatting of email');
       return;
     }
 
-    // Sign up successful
-    console.log(result);
+    const isPasswordValid = validatePasswordField(password);
 
-    // Redirect to the admin page
-    router.push("/admin");
+    if (!isPasswordValid) {
+      setAlert(true);
+      setLoading(false);
+      setAlertMessage('Passwords must be between 8-16 characters and contain a lowercase letter, uppercase letter, number and special character');
+      return;
+    }
+
+    // Attempt to sign up with provided email and password
+    signUp(username, email, password).then((error) => {
+      console.log('error');
+      if (error) {
+        setAlert(true);
+        setLoading(false);
+        setAlertMessage(error.message);
+        return;
+      }
+      router.refresh();
+      router.push("/");
+    });
   }
 
   return (
@@ -83,6 +105,19 @@ function Page(): JSX.Element {
           </button>
         </form>
       </div>
+
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
+      <Snackbar open={alert} autoHideDuration={6000} onClose={() => setAlert(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+        <Alert onClose={() => setAlert(false)} severity="error" sx={{ width: '100%' }}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

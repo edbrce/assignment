@@ -1,38 +1,24 @@
 "use client"
-import { Post } from "@/app/types"
-import Link from "next/link";
-import IconButton from '@mui/material/IconButton';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { AppUser, Post } from "@/app/types"
+import { Backdrop, CircularProgress, Divider } from "@mui/material";
+import { useAuthContext } from "@/context/AuthContext";
+import { PostOptions } from "./PostOptions";
 import { useState } from "react";
-import { Divider } from "@mui/material";
-
-const options = [
-    'delete'
-]
-const ITEM_HEIGHT = 48;
+import { useRouter } from "next/navigation";
 
 export const InlinePost = (data: Post) => {
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        event.preventDefault();
-        event.stopPropagation();
-        setAnchorEl(event.currentTarget);
-    };
-    const handleClose = (event: React.MouseEvent<HTMLElement>) => {
-        event.preventDefault();
-        event.stopPropagation();
-        setAnchorEl(null);
-    };
-    const { title, body, id, timestamp, author } = data;
-    const link = `post/${id}`;
+    const [loading, setLoading] = useState(false);
+    const { user } = useAuthContext() as { user: AppUser };
+    const router = useRouter();
+    const { isAdmin, uid } = user || { isAdmin: false, uid: '' };
+    const { title, body, id, timestamp, author, authorId } = data;
+    const isPostOwner = uid === authorId;
+    const link = `/post?postId=${id}`;
 
     return (
-        <><Link href={link}>
-            <div className="flex flex-row p-4 w-[50vw] hover:bg-gray-200 justify-between">
-                <div className="flex flex-col">
+        <><div >
+            <div className="flex flex-row p-4 w-[50vw] hover:bg-gray-200 justify-between cursor-pointer">
+                <div className="flex flex-col w-[45vw]" onClick={() => { router.push(link); setLoading(true) }}>
                     <div className='font-bold'>
                         {title}
                     </div>
@@ -40,41 +26,20 @@ export const InlinePost = (data: Post) => {
                         {body}
                     </div>
                     <div className="italic">
-                        <span className="font-semibold">{author} </span>posted on {timestamp.toDate().toLocaleString()}
+                        <span className="font-semibold">{author} </span>posted on {timestamp ? timestamp.toDate().toLocaleString() : 'unknown time'}
                     </div>
                 </div>
-                <IconButton
-                    aria-label="more"
-                    id="long-button"
-                    aria-controls={open ? 'long-menu' : undefined}
-                    aria-expanded={open ? 'true' : undefined}
-                    aria-haspopup="true"
-                    onClick={handleClick}
-                >
-                    <MoreVertIcon />
-                </IconButton>
-                <Menu
-                    id="long-menu"
-                    MenuListProps={{
-                        'aria-labelledby': 'long-button',
-                    }}
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={handleClose}
-                    PaperProps={{
-                        style: {
-                            maxHeight: ITEM_HEIGHT * 4.5,
-                        },
-                    }}
-                >
-                    {options.map((option) => (
-                        <MenuItem key={option} selected={option === 'Pyxis'} onClick={handleClose}>
-                            {option}
-                        </MenuItem>
-                    ))}
-                </Menu>
+                <PostOptions {...{ isAdmin, isPostOwner, postId: id }} />
             </div>
-        </Link><Divider /></>
+        </div>
+            <Divider />
 
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={loading}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
+        </>
     )
 }

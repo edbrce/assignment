@@ -1,34 +1,67 @@
 "use client"
+import { AppUser, Post } from '@/app/types';
+import { validateTextField } from '@/app/utils/validation';
 import { useAuthContext } from '@/context/AuthContext';
-import addData from '@/firebase/firestore/addData';
+import { getDocument } from '@/firebase/firestore/getData';
+import { updatePost } from '@/firebase/firestore/updateData';
 import { Alert, Backdrop, CircularProgress, Snackbar, TextField } from '@mui/material';
-import { Timestamp } from 'firebase/firestore';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { AppUser, Post } from '../types';
-import { validateTextField } from '../utils/validation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
 export default function Page(): JSX.Element {
     const { user } = useAuthContext() as { user: AppUser };
+    const [loading, setLoading] = useState(true);
     const [title, setTitle] = useState('');
     const [body, setBody] = useState('');
-    const [loading, setLoading] = useState(false);
     const [alert, setAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
+    const searchParams = useSearchParams()
     const router = useRouter();
+    const postId = searchParams.get('postId');
 
-    if (!user) {
-        router.push('/signin');
+    useEffect(() => {
+        if (!postId) {
+            router.push("/");
+            return;
+        }
+        getData(postId).then((data) => {
+            const { title, body, authorId } = data;
+
+            if (!(user.isAdmin || user.uid === authorId)) {
+                console.log(user.uid, authorId);
+                router.push('/');
+                return;
+            }
+
+            setTitle(title);
+            setBody(body);
+            setLoading(false);
+        });
+    }, [])
+
+
+    const getData = async (postId: string) => {
+        const { result, error } = await getDocument('posts', postId);
+
+        if (error) {
+            setAlert(true);
+            setLoading(false);
+            setAlertMessage(error.message);
+            return { title, body, authorId: '' };
+        }
+
+        const data = result?.data() as Post | undefined;
+
+        if (!data) {
+            throw new Error('no data');
+        }
+
+        return data;
     }
 
     const handleForm = async (event: { preventDefault: () => void }) => {
         event.preventDefault();
         setLoading(true);
-
-        console.log(body.codePointAt(7));
-
-        console.log(title, validateTextField(title), body, validateTextField(body))
 
         const isValid = validateTextField(title) && validateTextField(body);
 
@@ -39,12 +72,16 @@ export default function Page(): JSX.Element {
             return;
         }
 
-        const postId = uuidv4();
-        const secondsSinceEpoch = Math.round(Date.now() / 1000);
-        const timestamp = new Timestamp(secondsSinceEpoch, 0);
-        const postData: Omit<Post, 'id'> = { title, body, author: user.displayName || 'unknown user', timestamp, authorId: user.uid }
-        // Attempt to sign up with provided email and password
-        const { error } = await addData('posts', postId, postData);
+        const newData = {
+            title,
+            body
+        }
+
+        if (!postId) {
+            throw new Error('No postId');
+        }
+
+        const { error } = await updatePost(postId, newData);
 
         if (error) {
             setAlert(true);
@@ -56,19 +93,20 @@ export default function Page(): JSX.Element {
         router.push(`/post?postId=${postId}`);
     }
 
-    return user ? (
+    return loading ? (<></>) : (
         <div className="flex flex-col items-center justify-center h-screen">
             <div className="w-full max-w-2xl">
                 <form onSubmit={handleForm} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-                    <h1 className="text-3xl font-bold mb-6 text-black">Post</h1>
+                    <h1 className="text-3xl font-bold mb-6 text-black">Edit post</h1>
                     <div className="mb-4">
-                        <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">
                             Title
                         </label>
                         <TextField
                             onChange={(e) => setTitle(e.target.value)}
                             id="title"
                             className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+                            defaultValue={title}
                         />
 
                     </div>
@@ -81,6 +119,7 @@ export default function Page(): JSX.Element {
                             id="body"
                             multiline
                             rows={8}
+                            defaultValue={body}
                             className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-black focus:shadow-outline'
                         />
                     </div>
@@ -89,7 +128,7 @@ export default function Page(): JSX.Element {
                             type="submit"
                             className="w-full bg-yellow-400 text-black font-semibold py-4 rounded"
                         >
-                            Post
+                            Update Post
                         </button>
                     </div>
                 </form>
@@ -108,5 +147,5 @@ export default function Page(): JSX.Element {
                 </Alert>
             </Snackbar>
         </div>
-    ) : <></>
+    )
 }

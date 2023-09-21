@@ -1,10 +1,6 @@
 import { AuthContextProvider } from '@/context/AuthContext';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from './components/navigation/Navbar';
-
-// Load the Inter font with 'latin' subset
-const inter = Inter({ subsets: ['latin'] });
 
 // Metadata for the application
 export const metadata = {
@@ -23,9 +19,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
       */}
       <head />
       <body className='flex flex-col h-screen'>
-        <Navbar />
-        {/* Wrap the children with the AuthContextProvider to provide authentication context */}
         <AuthContextProvider>
+          <Navbar />
           {children}
         </AuthContextProvider>
       </body>

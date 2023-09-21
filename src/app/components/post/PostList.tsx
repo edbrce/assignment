@@ -2,69 +2,48 @@
 import { getRecentDocuments } from '@/firebase/firestore/getData';
 import React, { useEffect, useState } from 'react';
 import { InlinePost } from './InlinePost';
-import { QuerySnapshot, Timestamp } from 'firebase/firestore';
+import { QuerySnapshot } from 'firebase/firestore';
 import { Post } from '@/app/types';
+import { Alert, Snackbar } from '@mui/material';
 
 const PostList = () => {
     const [posts, setPosts] = useState<QuerySnapshot>();
+    const [alert, setAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
 
     useEffect(() => {
         getPosts();
     }, [])
 
     const getPosts = async () => {
-        // const posts = await getRecentDocuments();
+        const posts = await getRecentDocuments();
 
-        // const { result, error } = posts;
+        const { result, error } = posts;
 
-        // if (error || !result) {
-        //     throw new Error(error);
-        // }
+        if (error) {
+            setAlert(true);
+            setAlertMessage(error.message);
+            return { title: '', body: '', author: '', timestamp: null };
+        }
 
-        // setPosts(result);
-
-        setPosts({
-            docs: [
-                {
-                    data: () => ({
-                        title: 'test title',
-                        body: 'this is a body',
-                        author: 'tom',
-                        timestamp: new Timestamp(Math.round(Date.now() / 1000), 0)
-                    }),
-                    id: 'f9b13c23-db51-457b-9620-c57b80a2cc60 '
-                },
-                {
-                    data: () => ({
-                        title: 'Another title',
-                        body: 'this is a cool post',
-                        author: 'mike',
-                        timestamp: new Timestamp(Math.round(Date.now() / 1000), 0)
-                    })
-                },
-                {
-                    data: () => ({
-                        title: 'Yet another post title',
-                        body: 'woah so many posts',
-                        author: 'eddie',
-                        timestamp: new Timestamp(Math.round(Date.now() / 1000), 0)
-                    })
-                },
-
-            ]
-        } as any);
+        setPosts(result);
     }
 
 
 
     return (
-        <div>
+        <><div>
             {posts && posts.docs.map((post) => (
                 <div key={post.id}>
                     <InlinePost {...{ ...post.data(), id: post.id } as Post} />
                 </div>
             ))}
         </div>
+            <Snackbar open={alert} autoHideDuration={6000} onClose={() => setAlert(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+                <Alert onClose={() => setAlert(false)} severity="error" sx={{ width: '100%' }}>
+                    {alertMessage}
+                </Alert>
+            </Snackbar></>
     )
 }
 

@@ -1,5 +1,7 @@
+import { FirebaseError } from "firebase/app";
 import firebase_app from "../config";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { Post } from "@/app/types";
 
 // Get the Firestore instance
 const db = getFirestore(firebase_app);
@@ -8,7 +10,7 @@ const db = getFirestore(firebase_app);
 export default async function addData(
   collection: string,
   id: string,
-  data: any
+  data: Omit<Post, 'id'>
 ) {
   // Variable to store the result of the operation
   let result = null;
@@ -22,7 +24,7 @@ export default async function addData(
     });
   } catch (e) {
     // Catch and store any error that occurs during the operation
-    error = e;
+    error = e as FirebaseError;
   }
 
   // Return the result and error as an object

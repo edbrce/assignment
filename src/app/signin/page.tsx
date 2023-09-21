@@ -1,33 +1,47 @@
 'use client'
 import signIn from "@/firebase/auth/signIn";
+import { Alert, Backdrop, CircularProgress, Snackbar } from "@mui/material";
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
+import { validateEmailField, validatePasswordField } from "../utils/validation";
 
 function Page(): JSX.Element {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
   const router = useRouter();
 
   // Handle form submission
   const handleForm = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
+    setLoading(true);
 
-    // Attempt to sign in with provided email and password
-    const { result, error } = await signIn(email, password);
+    const isFormValid = validateEmailField(email) && validatePasswordField(password);
 
-    if (error) {
-      // Display and log any sign-in errors
-      console.log(error);
+    if (!isFormValid) {
+      setAlert(true);
+      setLoading(false);
+      setAlertMessage('Invalid credentials, please check the email and password entered');
       return;
     }
 
-    // Sign in successful
-    console.log(result);
+    // Attempt to sign in with provided email and password
+    const { error } = await signIn(email, password);
 
-    // Redirect to the admin page
-    // Typically you would want to redirect them to a protected page an add a check to see if they are admin or 
-    // create a new page for admin
-    router.push("/admin");
+    if (error) {
+      setAlert(true);
+      setLoading(false);
+      if (error.code === 'auth/invalid-login-credentials') {
+        setAlertMessage('Invalid credentials, please check the email and password entered');
+      } else {
+        setAlertMessage(error.code);
+      }
+      return;
+    }
+
+    router.push("/");
   }
 
   return (
@@ -73,6 +87,19 @@ function Page(): JSX.Element {
           </div>
         </form>
       </div>
+
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
+      <Snackbar open={alert} autoHideDuration={6000} onClose={() => setAlert(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+        <Alert onClose={() => setAlert(false)} severity="error" sx={{ width: '100%' }}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

@@ -1,8 +1,9 @@
 import firebase_app from "../config";
 import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit, Query, QuerySnapshot } from "firebase/firestore";
 import { FirebaseError } from '@firebase/util';
+import { User } from "firebase/auth";
 
-type GetRecentDocumentsResponse = { result?: QuerySnapshot, error?: any }
+type GetRecentDocumentsResponse = { result?: QuerySnapshot, error?: null | FirebaseError }
 // Get the Firestore instance
 const db = getFirestore(firebase_app);
 
@@ -20,20 +21,11 @@ export async function getDocument(collection: string, id: string) {
     result = await getDoc(docRef);
   } catch (e) {
     // Catch and store any error that occurs during the operation
-    error = e;
+    error = e as FirebaseError;
   }
 
   // Return the result and error as an object
   return { result, error };
-}
-
-export async function getRecentDocuments(): Promise<GetRecentDocumentsResponse> {
-  const postsRef = collection(db, 'posts');
-  const q = query(postsRef, orderBy('timestamp'), limit(5));
-
-  const posts = await getDocuments(q);
-
-  return posts;
 }
 
 async function getDocuments(query: Query): Promise<GetRecentDocumentsResponse> {
@@ -42,6 +34,29 @@ async function getDocuments(query: Query): Promise<GetRecentDocumentsResponse> {
 
     return { result: querySnapshot };
   } catch (e) {
-    return { error: e };
+    return { error: e as FirebaseError };
   }
+}
+
+export async function getRecentDocuments(): Promise<GetRecentDocumentsResponse> {
+  const postsRef = collection(db, 'posts');
+  const q = query(postsRef, orderBy('timestamp', 'desc'), limit(10));
+
+  const posts = await getDocuments(q);
+
+  return posts;
+}
+
+export async function isUserAdmin(user: User): Promise<boolean> {
+  const isUserAdmin = await getDocument('admins', user.uid);
+
+  const { result } = isUserAdmin;
+
+  console.log('admin?', isUserAdmin.result?.data(), user.uid);
+
+  if (result?.exists()) {
+    return result.data().admin || false;
+  }
+
+  return false;
 }

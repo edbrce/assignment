@@ -1,3 +1,4 @@
+import { FirebaseError } from "firebase/app";
 import firebase_app from "../config";
 import { createUserWithEmailAndPassword, getAuth, updateProfile } from "firebase/auth";
 
@@ -5,18 +6,19 @@ import { createUserWithEmailAndPassword, getAuth, updateProfile } from "firebase
 const auth = getAuth(firebase_app);
 
 // Function to sign up a user with email and password
-export default async function signUp(username: string, email: string, password: string) {
-  let result = null, // Variable to store the sign-up result
-    error = null; // Variable to store any error that occurs
+export default async function signUp(username: string, email: string, password: string): Promise<null | FirebaseError> {
+  let error: null | FirebaseError = null;
 
-  try {
-    result = await createUserWithEmailAndPassword(auth, email, password); // Create a new user with email and password
-    updateProfile(result.user, {
+  return createUserWithEmailAndPassword(auth, email, password).then((response) => {
+    return updateProfile(response.user, {
       displayName: username
-    });
-  } catch (e) {
-    error = e; // Catch and store any error that occurs during sign-up
-  }
+    }).then(() => {
+      return null;
+    })
+  }).catch((e) => {
+    console.log('found an error');
+    error = e as FirebaseError
+    return error;
+  });
 
-  return { result, error }; // Return the sign-up result and error (if any)
 }

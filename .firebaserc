@@ -1,7 +1,9 @@
 {
   "projects": {
     "default": "seandaassignment",
-    "new": "eddies-assignment"
+    "new": "eddies-assignment",
+    "dev": "seandaassignment",
+    "main": "eddies-assignment"
   },
   "targets": {},
   "etags": {}

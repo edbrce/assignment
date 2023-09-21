@@ -1,8 +1,10 @@
 'use client'
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import firebase_app from '@/firebase/config';
 import { CircularProgress } from '@mui/material';
+import { isUserAdmin } from '@/firebase/firestore/getData';
+import { AppUser } from '@/app/types';
 
 // Initialize Firebase auth instance
 const auth = getAuth(firebase_app);
@@ -19,15 +21,18 @@ interface AuthContextProviderProps {
 
 export function AuthContextProvider({ children }: AuthContextProviderProps): JSX.Element {
   // Set up state to track the authenticated user and loading status
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Subscribe to the authentication state changes
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // User is signed in
-        setUser(user);
+        const isAdmin = await isUserAdmin(user);
+        const appUser = user as AppUser;
+        appUser.isAdmin = isAdmin;
+
+        setUser(appUser);
       } else {
         // User is signed out
         setUser(null);
