@@ -6,15 +6,15 @@ import { signInWithEmailAndPassword, getAuth } from 'firebase/auth';
 const auth = getAuth(firebase_app);
 
 // Function to sign in with email and password
-export default async function signIn(email: string, password: string) {
-    let result = null, // Variable to store the sign-in result
-        error = null; // Variable to store any error that occurs
-
-    try {
-        result = await signInWithEmailAndPassword(auth, email, password); // Sign in with email and password
-    } catch (e) {
-        error = e as FirebaseError; // Catch and store any error that occurs during sign-in
-    }
-
-    return { result, error }; // Return the sign-in result and error (if any)
+export default async function signIn(
+    email: string,
+    password: string
+): Promise<null | FirebaseError> {
+    return signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+            return null;
+        })
+        .catch((error) => {
+            return error as FirebaseError;
+        });
 }

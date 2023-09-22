@@ -1,17 +1,16 @@
 'use client';
 import signUp from '@/firebase/auth/signup';
-import { Alert, Backdrop, CircularProgress, Snackbar } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { validateEmailField, validatePasswordField } from '../utils/validation';
+import { AppContext, useAppContext } from '@/context/AppContext';
 
 function Page(): JSX.Element {
+    const { setLoading, setAlert, setAlertMessage } =
+        useAppContext() as AppContext;
     const [username, setUserName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [alert, setAlert] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');
     const router = useRouter();
 
     // Handle form submission
@@ -48,6 +47,7 @@ function Page(): JSX.Element {
                 setAlertMessage(error.message);
                 return;
             }
+            setLoading(false);
             router.refresh();
             router.push('/');
         });
@@ -113,31 +113,6 @@ function Page(): JSX.Element {
                     </button>
                 </form>
             </div>
-
-            <Backdrop
-                sx={{
-                    color: '#fff',
-                    zIndex: (theme) => theme.zIndex.drawer + 1
-                }}
-                open={loading}
-            >
-                <CircularProgress color="inherit" />
-            </Backdrop>
-
-            <Snackbar
-                open={alert}
-                autoHideDuration={6000}
-                onClose={() => setAlert(false)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            >
-                <Alert
-                    onClose={() => setAlert(false)}
-                    severity="error"
-                    sx={{ width: '100%' }}
-                >
-                    {alertMessage}
-                </Alert>
-            </Snackbar>
         </div>
     );
 }

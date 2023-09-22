@@ -5,8 +5,14 @@ import { getFirestore, doc, deleteDoc } from 'firebase/firestore';
 // Get the Firestore instance
 const db = getFirestore(firebase_app);
 
+export const deletePost = async (
+    postId: string
+): Promise<null | FirebaseError> => {
+    return await deleteData('posts', postId);
+};
+
 // Function to delete data from a Firestore collection
-export default async function deleteData(
+async function deleteData(
     collection: string,
     id: string
 ): Promise<null | FirebaseError> {
@@ -18,11 +24,3 @@ export default async function deleteData(
             return error as FirebaseError;
         });
 }
-
-export const deletePost = async (
-    postId: string
-): Promise<null | FirebaseError> => {
-    return deleteData('posts', postId).then((error) => {
-        return error;
-    });
-};

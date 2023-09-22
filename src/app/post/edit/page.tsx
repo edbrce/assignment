@@ -1,31 +1,26 @@
 'use client';
 import { AppUser, Post } from '@/app/types';
 import { validateTextField } from '@/app/utils/validation';
+import { AppContext, useAppContext } from '@/context/AppContext';
 import { useAuthContext } from '@/context/AuthContext';
 import { getDocument } from '@/firebase/firestore/getData';
 import { updatePost } from '@/firebase/firestore/updateData';
-import {
-    Alert,
-    Backdrop,
-    CircularProgress,
-    Snackbar,
-    TextField
-} from '@mui/material';
+import { TextField } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 export default function Page(): JSX.Element {
     const { user } = useAuthContext() as { user: AppUser };
-    const [loading, setLoading] = useState(true);
+    const { loading, setLoading, setAlert, setAlertMessage } =
+        useAppContext() as AppContext;
     const [title, setTitle] = useState('');
     const [body, setBody] = useState('');
-    const [alert, setAlert] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');
     const searchParams = useSearchParams();
     const router = useRouter();
     const postId = searchParams.get('postId');
 
     useEffect(() => {
+        setLoading(true);
         if (!postId) {
             router.push('/');
             return;
@@ -48,19 +43,17 @@ export default function Page(): JSX.Element {
     const getData = async (postId: string) => {
         const { result, error } = await getDocument('posts', postId);
 
-        if (error) {
+        if (error || !result || !result.data()) {
             setAlert(true);
             setLoading(false);
-            setAlertMessage(error.message);
+            setAlertMessage(
+                error ? error.message : 'No data found for this post'
+            );
+            router.push('/');
             return { title, body, authorId: '' };
         }
 
-        const data = result?.data() as Post | undefined;
-
-        if (!data) {
-            throw new Error('no data');
-        }
-
+        const data = result.data() as Post;
         return data;
     };
 
@@ -88,7 +81,7 @@ export default function Page(): JSX.Element {
             throw new Error('No postId');
         }
 
-        const { error } = await updatePost(postId, newData);
+        const error = await updatePost(postId, newData);
 
         if (error) {
             setAlert(true);
@@ -96,7 +89,7 @@ export default function Page(): JSX.Element {
             setAlertMessage(error.message);
             return;
         }
-
+        setLoading(false);
         router.push(`/post?postId=${postId}`);
     };
 
@@ -149,31 +142,6 @@ export default function Page(): JSX.Element {
                     </div>
                 </form>
             </div>
-
-            <Backdrop
-                sx={{
-                    color: '#fff',
-                    zIndex: (theme) => theme.zIndex.drawer + 1
-                }}
-                open={loading}
-            >
-                <CircularProgress color="inherit" />
-            </Backdrop>
-
-            <Snackbar
-                open={alert}
-                autoHideDuration={6000}
-                onClose={() => setAlert(false)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            >
-                <Alert
-                    onClose={() => setAlert(false)}
-                    severity="error"
-                    sx={{ width: '100%' }}
-                >
-                    {alertMessage}
-                </Alert>
-            </Snackbar>
         </div>
     );
 }

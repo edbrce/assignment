@@ -1,5 +1,5 @@
 export const validateTextField = (text: string) => {
-    const textRegex = new RegExp(/^[a-zA-Z0-9.,!?'-(\r?\n)]{1,500}$/);
+    const textRegex = new RegExp(/^[a-zA-Z 0-9.,!?'\-(\r?\n)]{1,500}$/);
     return validate(text, textRegex);
 };
 

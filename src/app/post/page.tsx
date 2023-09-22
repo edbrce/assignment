@@ -1,22 +1,24 @@
 'use client';
 import { Post } from '@/app/types';
+import { AppContext, useAppContext } from '@/context/AppContext';
 import { getDocument } from '@/firebase/firestore/getData';
-import { Alert, Divider, Snackbar } from '@mui/material';
+import { Divider } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
+    const { setLoading, setAlert, setAlertMessage } =
+        useAppContext() as AppContext;
     const [title, setTitle] = useState('');
     const [body, setBody] = useState('');
     const [author, setAuthor] = useState('');
     const [timestamp, setTimestamp] = useState<string | null>(null);
-    const [alert, setAlert] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');
     const searchParams = useSearchParams();
     const router = useRouter();
     const postId = searchParams.get('postId');
 
     useEffect(() => {
+        setLoading(true);
         if (!postId) {
             router.push('/');
             return;
@@ -32,25 +34,24 @@ export default function Page() {
             setBody(body);
             setAuthor(author);
             setTimestamp(timestamp && timestamp.toDate().toLocaleString());
+            setLoading(false);
         });
     }, []);
 
     const getData = async (postId: string) => {
         const { result, error } = await getDocument('posts', postId);
 
-        if (error) {
+        if (error || !result || !result.data()) {
             setAlert(true);
-            setAlertMessage(error.message);
-            return { title, body, author, timestamp: null };
-        }
-
-        const data = result?.data() as Post | undefined;
-
-        if (!data) {
+            setLoading(false);
+            setAlertMessage(
+                error ? error.message : 'No data found for this post'
+            );
             router.push('/');
-            return;
+            return { title, body, authorId: '' };
         }
 
+        const data = result.data() as Post;
         return data;
     };
 
@@ -69,21 +70,6 @@ export default function Page() {
 
                 <div className="text-3xl py-12 whitespace-pre-line">{body}</div>
             </div>
-
-            <Snackbar
-                open={alert}
-                autoHideDuration={6000}
-                onClose={() => setAlert(false)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            >
-                <Alert
-                    onClose={() => setAlert(false)}
-                    severity="error"
-                    sx={{ width: '100%' }}
-                >
-                    {alertMessage}
-                </Alert>
-            </Snackbar>
         </div>
     );
 }

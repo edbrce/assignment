@@ -1,11 +1,10 @@
 'use client';
 import Link from 'next/link';
 import PostList from './components/post/PostList';
-import { useState } from 'react';
-import { Backdrop, CircularProgress } from '@mui/material';
+import { AppContext, useAppContext } from '@/context/AppContext';
 
 export default function Home() {
-    const [loading, setLoading] = useState(false);
+    const { setLoading } = useAppContext() as AppContext;
 
     return (
         <main className="flex flex-col items-center justify-between p-24 gap-24">
@@ -43,15 +42,6 @@ export default function Home() {
                     </Link>
                 </div>
             </div>
-            <Backdrop
-                sx={{
-                    color: '#fff',
-                    zIndex: (theme) => theme.zIndex.drawer + 1
-                }}
-                open={loading}
-            >
-                <CircularProgress color="inherit" />
-            </Backdrop>
         </main>
     );
 }

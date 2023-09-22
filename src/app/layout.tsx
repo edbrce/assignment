@@ -1,6 +1,7 @@
 import { AuthContextProvider } from '@/context/AuthContext';
 import './globals.css';
 import Navbar from './components/navigation/Navbar';
+import { AppContextProvider } from '@/context/AppContext';
 
 // Metadata for the application
 export const metadata = {
@@ -9,6 +10,8 @@ export const metadata = {
 };
 
 // Root layout component for the application
+// We include the Navbar to every page and provide each
+// page with autheitcation and application context
 export default function RootLayout({
     children
 }: {
@@ -24,8 +27,10 @@ export default function RootLayout({
             <head />
             <body className="flex flex-col h-screen">
                 <AuthContextProvider>
-                    <Navbar />
-                    {children}
+                    <AppContextProvider>
+                        <Navbar />
+                        {children}
+                    </AppContextProvider>
                 </AuthContextProvider>
             </body>
         </html>

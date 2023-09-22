@@ -1,45 +1,33 @@
 'use client';
 import { useAuthContext } from '@/context/AuthContext';
-import addData from '@/firebase/firestore/addData';
-import {
-    Alert,
-    Backdrop,
-    CircularProgress,
-    Snackbar,
-    TextField
-} from '@mui/material';
+import { addPost } from '@/firebase/firestore/addData';
+import { TextField } from '@mui/material';
 import { Timestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { AppUser, Post } from '../types';
 import { validateTextField } from '../utils/validation';
+import { AppContext, useAppContext } from '@/context/AppContext';
 
 export default function Page(): JSX.Element {
     const { user } = useAuthContext() as { user: AppUser };
+    const { setLoading, setAlert, setAlertMessage } =
+        useAppContext() as AppContext;
     const [title, setTitle] = useState('');
     const [body, setBody] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [alert, setAlert] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');
     const router = useRouter();
 
-    if (!user) {
-        router.push('/signin');
-    }
+    useEffect(() => {
+        setLoading(false);
+        if (!user) {
+            router.push('/signin');
+        }
+    }, [user]);
 
     const handleForm = async (event: { preventDefault: () => void }) => {
         event.preventDefault();
         setLoading(true);
-
-        console.log(body.codePointAt(7));
-
-        console.log(
-            title,
-            validateTextField(title),
-            body,
-            validateTextField(body)
-        );
 
         const isValid = validateTextField(title) && validateTextField(body);
 
@@ -63,7 +51,7 @@ export default function Page(): JSX.Element {
             authorId: user.uid
         };
         // Attempt to sign up with provided email and password
-        const { error } = await addData('posts', postId, postData);
+        const error = await addPost(postId, postData);
 
         if (error) {
             setAlert(true);
@@ -72,6 +60,7 @@ export default function Page(): JSX.Element {
             return;
         }
 
+        setLoading(false);
         router.push(`/post?postId=${postId}`);
     };
 
@@ -121,31 +110,6 @@ export default function Page(): JSX.Element {
                     </div>
                 </form>
             </div>
-
-            <Backdrop
-                sx={{
-                    color: '#fff',
-                    zIndex: (theme) => theme.zIndex.drawer + 1
-                }}
-                open={loading}
-            >
-                <CircularProgress color="inherit" />
-            </Backdrop>
-
-            <Snackbar
-                open={alert}
-                autoHideDuration={6000}
-                onClose={() => setAlert(false)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            >
-                <Alert
-                    onClose={() => setAlert(false)}
-                    severity="error"
-                    sx={{ width: '100%' }}
-                >
-                    {alertMessage}
-                </Alert>
-            </Snackbar>
         </div>
     ) : (
         <></>

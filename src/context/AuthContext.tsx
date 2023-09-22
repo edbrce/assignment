@@ -28,7 +28,6 @@ interface AuthContextProviderProps {
 export function AuthContextProvider({
     children
 }: AuthContextProviderProps): JSX.Element {
-    // Set up state to track the authenticated user and loading status
     const [user, setUser] = useState<AppUser | null>(null);
     const [loading, setLoading] = useState(true);
 

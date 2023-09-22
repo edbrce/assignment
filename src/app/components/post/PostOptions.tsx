@@ -43,7 +43,6 @@ export const PostOptions = ({
     const handleDelete = async () => {
         setConfirmDelete(false);
         deletePost(postId).then(() => {
-            console.log('refreshing');
             window.location.reload();
         });
     };

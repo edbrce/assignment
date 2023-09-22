@@ -15,8 +15,6 @@ export default async function signUp(
     email: string,
     password: string
 ): Promise<null | FirebaseError> {
-    let error: null | FirebaseError = null;
-
     return createUserWithEmailAndPassword(auth, email, password)
         .then((response) => {
             return updateProfile(response.user, {
@@ -25,9 +23,7 @@ export default async function signUp(
                 return null;
             });
         })
-        .catch((e) => {
-            console.log('found an error');
-            error = e as FirebaseError;
-            return error;
+        .catch((error) => {
+            return error as FirebaseError;
         });
 }

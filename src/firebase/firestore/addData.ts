@@ -6,27 +6,26 @@ import { Post } from '@/app/types';
 // Get the Firestore instance
 const db = getFirestore(firebase_app);
 
+export const addPost = async (
+    postId: string,
+    postData: Omit<Post, 'id'>
+): Promise<null | FirebaseError> => {
+    return await addData('posts', postId, postData);
+};
+
 // Function to add data to a Firestore collection
-export default async function addData(
+async function addData(
     collection: string,
     id: string,
     data: Omit<Post, 'id'>
-) {
-    // Variable to store the result of the operation
-    let result = null;
-    // Variable to store any error that occurs during the operation
-    let error = null;
-
-    try {
-        // Set the document with the provided data in the specified collection and ID
-        result = await setDoc(doc(db, collection, id), data, {
-            merge: true // Merge the new data with existing document data
+): Promise<null | FirebaseError> {
+    return setDoc(doc(db, collection, id), data, {
+        merge: true // Merge the new data with existing document data
+    })
+        .then(() => {
+            return null;
+        })
+        .catch((error) => {
+            return error as FirebaseError;
         });
-    } catch (e) {
-        // Catch and store any error that occurs during the operation
-        error = e as FirebaseError;
-    }
-
-    // Return the result and error as an object
-    return { result, error };
 }
