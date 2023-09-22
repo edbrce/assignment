@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import { getRecentDocuments } from '@/firebase/firestore/getData';
 import React, { useEffect, useState } from 'react';
 import { InlinePost } from './InlinePost';
@@ -13,7 +13,7 @@ const PostList = () => {
 
     useEffect(() => {
         getPosts();
-    }, [])
+    }, []);
 
     const getPosts = async () => {
         const posts = await getRecentDocuments();
@@ -27,22 +27,36 @@ const PostList = () => {
         }
 
         setPosts(result);
-    }
+    };
 
     return (
-        <><div>
-            {posts && posts.docs.map((post) => (
-                <div key={post.id}>
-                    <InlinePost {...{ ...post.data(), id: post.id } as Post} />
-                </div>
-            ))}
-        </div>
-            <Snackbar open={alert} autoHideDuration={6000} onClose={() => setAlert(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-                <Alert onClose={() => setAlert(false)} severity="error" sx={{ width: '100%' }}>
+        <>
+            <div>
+                {posts &&
+                    posts.docs.map((post) => (
+                        <div key={post.id}>
+                            <InlinePost
+                                {...({ ...post.data(), id: post.id } as Post)}
+                            />
+                        </div>
+                    ))}
+            </div>
+            <Snackbar
+                open={alert}
+                autoHideDuration={6000}
+                onClose={() => setAlert(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={() => setAlert(false)}
+                    severity="error"
+                    sx={{ width: '100%' }}
+                >
                     {alertMessage}
                 </Alert>
-            </Snackbar></>
-    )
-}
+            </Snackbar>
+        </>
+    );
+};
 
 export default PostList;

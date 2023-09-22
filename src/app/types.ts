@@ -1,5 +1,5 @@
-import { User } from "firebase/auth";
-import { Timestamp } from "firebase/firestore";
+import { User } from 'firebase/auth';
+import { Timestamp } from 'firebase/firestore';
 
 export type Post = {
     title: string;
@@ -8,6 +8,6 @@ export type Post = {
     timestamp: Timestamp;
     id: string;
     authorId: string;
-}
+};
 
 export type AppUser = User & { isAdmin: boolean };

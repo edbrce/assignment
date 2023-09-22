@@ -1,6 +1,6 @@
-import { FirebaseError } from "firebase/app";
-import firebase_app from "../config";
-import { getAuth } from "firebase/auth";
+import { FirebaseError } from 'firebase/app';
+import firebase_app from '../config';
+import { getAuth } from 'firebase/auth';
 
 // Get the authentication instance using the Firebase app
 const auth = getAuth(firebase_app);
@@ -11,7 +11,7 @@ export default async function signOut() {
         error = null; // Variable to store any error that occurs
 
     try {
-        result = await auth.signOut() // Sign in with email and password
+        result = await auth.signOut(); // Sign in with email and password
     } catch (e) {
         error = e as FirebaseError; // Catch and store any error that occurs during sign-in
     }

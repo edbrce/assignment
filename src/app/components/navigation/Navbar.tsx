@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React from 'react';
 import LogoSection from './LogoSection';
 import UserSection from './UserSection';
@@ -9,6 +9,5 @@ export default function Navbar() {
             <LogoSection />
             <UserSection />
         </nav>
-
-    )
+    );
 }

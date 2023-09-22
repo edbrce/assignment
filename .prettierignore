@@ -1,0 +1,8 @@
+.npm
+.config
+.next/
+build/
+dist/
+package-lock.json
+GeneratedTypes.ts
+coverage

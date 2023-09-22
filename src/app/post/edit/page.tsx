@@ -1,10 +1,16 @@
-"use client"
+'use client';
 import { AppUser, Post } from '@/app/types';
 import { validateTextField } from '@/app/utils/validation';
 import { useAuthContext } from '@/context/AuthContext';
 import { getDocument } from '@/firebase/firestore/getData';
 import { updatePost } from '@/firebase/firestore/updateData';
-import { Alert, Backdrop, CircularProgress, Snackbar, TextField } from '@mui/material';
+import {
+    Alert,
+    Backdrop,
+    CircularProgress,
+    Snackbar,
+    TextField
+} from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
@@ -15,13 +21,13 @@ export default function Page(): JSX.Element {
     const [body, setBody] = useState('');
     const [alert, setAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
-    const searchParams = useSearchParams()
+    const searchParams = useSearchParams();
     const router = useRouter();
     const postId = searchParams.get('postId');
 
     useEffect(() => {
         if (!postId) {
-            router.push("/");
+            router.push('/');
             return;
         }
         getData(postId).then((data) => {
@@ -37,8 +43,7 @@ export default function Page(): JSX.Element {
             setBody(body);
             setLoading(false);
         });
-    }, [])
-
+    }, []);
 
     const getData = async (postId: string) => {
         const { result, error } = await getDocument('posts', postId);
@@ -57,7 +62,7 @@ export default function Page(): JSX.Element {
         }
 
         return data;
-    }
+    };
 
     const handleForm = async (event: { preventDefault: () => void }) => {
         event.preventDefault();
@@ -68,14 +73,16 @@ export default function Page(): JSX.Element {
         if (!isValid) {
             setAlert(true);
             setLoading(false);
-            setAlertMessage('Fields must be non-blank and only contain letters or basic characters');
+            setAlertMessage(
+                'Fields must be non-blank and only contain letters or basic characters'
+            );
             return;
         }
 
         const newData = {
             title,
             body
-        }
+        };
 
         if (!postId) {
             throw new Error('No postId');
@@ -91,13 +98,20 @@ export default function Page(): JSX.Element {
         }
 
         router.push(`/post?postId=${postId}`);
-    }
+    };
 
-    return loading ? (<></>) : (
+    return loading ? (
+        <></>
+    ) : (
         <div className="flex flex-col items-center justify-center h-screen">
             <div className="w-full max-w-2xl">
-                <form onSubmit={handleForm} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-                    <h1 className="text-3xl font-bold mb-6 text-black">Edit post</h1>
+                <form
+                    onSubmit={handleForm}
+                    className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+                >
+                    <h1 className="text-3xl font-bold mb-6 text-black">
+                        Edit post
+                    </h1>
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2">
                             Title
@@ -105,13 +119,15 @@ export default function Page(): JSX.Element {
                         <TextField
                             onChange={(e) => setTitle(e.target.value)}
                             id="title"
-                            className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             defaultValue={title}
                         />
-
                     </div>
                     <div className="mb-6">
-                        <label htmlFor="post" className="block text-gray-700 text-sm font-bold mb-2">
+                        <label
+                            htmlFor="post"
+                            className="block text-gray-700 text-sm font-bold mb-2"
+                        >
                             Post
                         </label>
                         <TextField
@@ -120,7 +136,7 @@ export default function Page(): JSX.Element {
                             multiline
                             rows={8}
                             defaultValue={body}
-                            className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-black focus:shadow-outline'
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-black focus:shadow-outline"
                         />
                     </div>
                     <div className="flex items-center justify-between">
@@ -135,17 +151,29 @@ export default function Page(): JSX.Element {
             </div>
 
             <Backdrop
-                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                sx={{
+                    color: '#fff',
+                    zIndex: (theme) => theme.zIndex.drawer + 1
+                }}
                 open={loading}
             >
                 <CircularProgress color="inherit" />
             </Backdrop>
 
-            <Snackbar open={alert} autoHideDuration={6000} onClose={() => setAlert(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-                <Alert onClose={() => setAlert(false)} severity="error" sx={{ width: '100%' }}>
+            <Snackbar
+                open={alert}
+                autoHideDuration={6000}
+                onClose={() => setAlert(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={() => setAlert(false)}
+                    severity="error"
+                    sx={{ width: '100%' }}
+                >
                     {alertMessage}
                 </Alert>
             </Snackbar>
         </div>
-    )
+    );
 }

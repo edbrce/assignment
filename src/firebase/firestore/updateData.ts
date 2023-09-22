@@ -1,16 +1,12 @@
-import { FirebaseError } from "firebase/app";
-import firebase_app from "../config";
-import { getFirestore, doc, updateDoc } from "firebase/firestore";
+import { FirebaseError } from 'firebase/app';
+import firebase_app from '../config';
+import { getFirestore, doc, updateDoc } from 'firebase/firestore';
 
 // Get the Firestore instance
 const db = getFirestore(firebase_app);
 
 // Function to add data to a Firestore collection
-async function updateData(
-    collection: string,
-    id: string,
-    newData: object
-) {
+async function updateData(collection: string, id: string, newData: object) {
     // Variable to store the result of the operation
     let result = null;
     // Variable to store any error that occurs during the operation
@@ -28,6 +24,9 @@ async function updateData(
     return { result, error };
 }
 
-export const updatePost = async (postId: string, newData: { title: string, body: string }) => {
+export const updatePost = async (
+    postId: string,
+    newData: { title: string; body: string }
+) => {
     return await updateData('posts', postId, newData);
-}
+};
