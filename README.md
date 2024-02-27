@@ -1,6 +1,6 @@
-## Software Engineering and Agile Assignment
+## Software Engineering and DevOps Assignment
 
-This is my submission for the software engineering and agile assignment.
+This is my submission for the software engineering and devOps assignment.
 
 To view the application, visit https://eddies-assignment.web.app/.
 

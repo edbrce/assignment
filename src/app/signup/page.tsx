@@ -40,7 +40,6 @@ function Page(): JSX.Element {
 
         // Attempt to sign up with provided email and password
         signUp(username, email, password).then((error) => {
-            console.log('error');
             if (error) {
                 setAlert(true);
                 setLoading(false);
