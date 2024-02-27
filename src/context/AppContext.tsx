@@ -9,10 +9,8 @@ export type AppContext = {
     setAlertMessage: (message: string) => void;
 };
 
-// Create the app context
-export const AppContext = createContext({});
+const AppContext = createContext({});
 
-// Custom hook to access the app context
 export const useAppContext = () => useContext(AppContext);
 
 interface AppContextProviderProps {
