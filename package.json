@@ -7,7 +7,9 @@
         "build": "npm install && next build && next export",
         "start": "next start",
         "lint": "next lint",
-        "format": "prettier --write '**/*.{ts,tsx,json,scss,css,md}'"
+        "format": "prettier --write '**/*.{ts,tsx,json,scss,css,md}'",
+        "cypress:open": "cypress open",
+        "e2e:headless": "start-server-and-test dev http://localhost:3000 \"cypress run --e2e\""
     },
     "dependencies": {
         "@emotion/react": "^11.11.1",
@@ -33,6 +35,8 @@
         "@types/uuid": "^9.0.4",
         "@typescript-eslint/eslint-plugin": "^6.7.2",
         "@typescript-eslint/parser": "^6.7.2",
-        "prettier": "^3.0.3"
+        "cypress": "^13.6.6",
+        "prettier": "^3.0.3",
+        "start-server-and-test": "^2.0.3"
     }
 }

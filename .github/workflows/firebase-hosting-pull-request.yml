@@ -15,3 +15,13 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_EDDIES_ASSIGNMENT }}'
           projectId: eddies-assignment
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cypress run
+        uses: cypress-io/github-action@v3
+        with:
+          project: ./site
+          browser: chrome
+          start: npm run dev
+          wait-on: "http://localhost:3000"
