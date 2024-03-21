@@ -6,6 +6,8 @@ import { AppContext, useAppContext } from '@/context/AppContext';
 export default function Home() {
     const { setLoading } = useAppContext() as AppContext;
 
+    console.log(process.env.CYPRESS_ADMIN_EMAIL);
+
     return (
         <main className="flex flex-col items-center justify-between p-24 gap-24">
             <div className="text-2xl">
@@ -36,7 +38,10 @@ export default function Home() {
                     </div>
 
                     <Link href="/new-post" onClick={() => setLoading(true)}>
-                        <span className="py-2 px-6 bg-yellow-400 hover:bg-yellow-600 text-l text-gray-900 font-bold rounded-xl">
+                        <span
+                            className="py-2 px-6 bg-yellow-400 hover:bg-yellow-600 text-l text-gray-900 font-bold rounded-xl"
+                            id="make-post"
+                        >
                             Make a post
                         </span>
                     </Link>

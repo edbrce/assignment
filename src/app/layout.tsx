@@ -5,8 +5,8 @@ import { AppContextProvider } from '@/context/AppContext';
 
 // Metadata for the application
 export const metadata = {
-    title: 'Software and Agile Assignment',
-    description: 'Submission for the Sofware engineering and Agile module'
+    title: 'Eddies Assignment',
+    description: 'Submission for the Software Engineering and Devops module'
 };
 
 // Root layout component for the application

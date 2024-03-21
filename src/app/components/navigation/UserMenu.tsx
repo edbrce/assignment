@@ -26,6 +26,7 @@ export const UserMenu = ({ displayName }: { displayName: string }) => {
             <button
                 onClick={handleClick}
                 className="cursor-pointer lg:inline-block lg:ml-auto lg:mr-3 py-2 px-6 bg-gray-50 hover:bg-gray-200 text-sm text-gray-900 font-bold rounded-xl"
+                id="nav-user"
             >
                 Hi {displayName}
             </button>
