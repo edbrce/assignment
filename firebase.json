@@ -1,17 +1,13 @@
 {
-  "hosting": {
-    "public": "out",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "cleanUrls": true,
-    "rewrites": [
-      {
-        "source": "/**",
-        "dynamicLinks": true
-      }
-    ]
-  }
+    "hosting": {
+        "public": "out",
+        "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+        "cleanUrls": true,
+        "rewrites": [
+            {
+                "source": "/**",
+                "dynamicLinks": true
+            }
+        ]
+    }
 }

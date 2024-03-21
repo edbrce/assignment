@@ -97,6 +97,7 @@ function Page(): JSX.Element {
                         <button
                             type="submit"
                             className="w-full bg-yellow-400 text-black font-semibold py-2 rounded"
+                            id="sign-in"
                         >
                             Sign In
                         </button>

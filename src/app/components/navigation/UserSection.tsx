@@ -24,7 +24,7 @@ export default function UserSection() {
     ) : (
         <div className="flex flex-row">
             <div className="flex items-center justify-between">
-                <Link href="/signin">
+                <Link href="/signin" id="nav-login">
                     <span className="lg:ml-auto lg:mr-3 py-2 px-6 bg-gray-50 hover:bg-gray-200 text-sm text-gray-900 font-bold rounded-xl">
                         Login
                     </span>
