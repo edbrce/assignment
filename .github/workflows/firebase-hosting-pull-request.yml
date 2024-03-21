@@ -20,3 +20,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: npm install && npm run e2e:headless
+        env:
+          CYPRESS_ADMIN_EMAIL: '${{ secrets.CYPRESS_ADMIN_EMAIL }}'
+          CYPRESS_ADMIN_PASSWORD: '${{ secrets.CYPRESS_ADMIN_PASSWORD }}'

@@ -22,8 +22,9 @@ google account used to host the project
 
 #### Cypress testing
 
-To run integration tests locally, ensure you have the following environment
-variables set export CYPRESS_ADMIN_PASSWORD='AdminPa$$w0rd' export
+To run integration tests locally, ensure you have the following environment variables set
 CYPRESS_ADMIN_EMAIL='admin@email.com'
+CYPRESS_ADMIN_PASSWORD='AdminPa$$w0rd'
+
 
 then run `npm run e2e:headless`
